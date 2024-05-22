@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload PDF</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f3f3f3;
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    footer {
+      background-color: #333;
+      color: #fff;
+      padding: 10px 0;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    form {
+      text-align: center;
+    }
+
+    input[type="file"] {
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    button[type="submit"] {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #pdfContent {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+    }
+
+    @media screen and (max-width: 600px) {
+      .container {
+        margin: 20px auto;
+        padding: 20px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Upload PDF</h1>
+  </header>
+
+  <div class="container">
+    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+      <input type="file" name="pdf" id="pdfInput" accept="application/pdf" required>
+      <button type="submit">Upload</button>
+    </form>
+
+    <div id="pdfContent"></div>
+  </div>
+
+  <footer id="footer">
+    <p id="fileName">File Name : </p>
+  </footer>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+
+      try {
+        const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to upload PDF');
+        }
+
+        const data = await response.json();
+        displayPDFContent(data.content);
+      } catch (error) {
+        console.error('Error:', error);
+        // Handle error
+      }
+    });
+
+    document.getElementById('pdfInput').addEventListener('change', function () {
+      const fileName = this.files[0].name;
+      document.getElementById('fileName').innerText = fileName;
+    });
+
+    function displayPDFContent(content) {
+      const pdfContentDiv = document.getElementById('pdfContent');
+      pdfContentDiv.innerHTML = + '<table>' + '<pre>' + content + '</pre>' + '</table>';
+    }
+  </script>
+</body>
+
+</html>
